@@ -15,6 +15,10 @@ sequenceDiagram
     participant BJ as Back(job)
   end
 
+  box Class
+    participant CA as Ahthorize
+  end
+
   box Database
     participant DA as DB(auth)
     participant DM as DB(job-master)
@@ -26,13 +30,17 @@ sequenceDiagram
 
   HM ->>+ FR: ログイン
   FR ->>+ BA: プレ要求(USER)
-  BA ->>+ DA: 検索／更新
-  DA --)- BA:
+  BA ->>+ CA: マジックナンバー取得処理
+  CA ->>+ DA:
+  DA --)- CA:
+  CA --)- BA:
   BA --)- FR: 応答(MAGIC_NUMBER)
 
   FR ->>+ BA: 開錠要求(USER, MAGIC_NUMBER, HASH_PASS)
-  BA ->>+ DA: select/update
-  DA --)- BA: username, password, ...
+  BA ->>+ CA: 認証処理
+  CA ->>+ DA:
+  DA --)- CA:
+  CA --)- BA:
   BA --)- FR: 開錠応答(RESULT, SEQ_NUMBER)
   note over FR: 更新 session storage<br>USER, SEQ_NUMBER
 
@@ -40,10 +48,14 @@ sequenceDiagram
   MN --)- FR:
   note over FR: 取得 session storage<br>USER, SEQ_NUMBER
   FR ->>+ BM: JOB一覧要求(USER, SEQ_NUMBER)
-  BM ->>+ DA: 検証、更新
-  DA --)- BM:
-  BM ->>+ DM: 一覧取得
-  DM --)- BM:
+  BM ->>+ CA: 認証延長処理
+  CA ->>+ DA:
+  DA --)- CA:
+  CA --)- BM:
+  BM ->>+ CA: 機能一覧取得
+  CA ->>+ DA:
+  DA --)- CA:
+  CA --)- BM:
   BM --)- FR: JOB一覧応答(RESULT, SEQ_NUMBER, JOB一覧)
   note over FR: 更新 session storage<br>USER, SEQ_NUMBER
   FR --)- HM: メニュー表示
@@ -53,8 +65,10 @@ sequenceDiagram
   JB --)- FR:
   note over FR: 取得 session storage<br>USER, SEQ_NUMBER
   FR ->>+ BJ: 要求
-  BJ ->>+ DA: 検索／更新
-  DA --)- BJ:
+  BJ ->>+ CA: 認証延長処理
+  CA ->>+ DA:
+  DA --)- CA:
+  CA --)- BJ:
   BJ ->>+ DJ: 業務処理
   DJ --)- BJ:
   BJ --)- FR: 応答(RESULT, SEQ_NUMBER, 業務の結果)

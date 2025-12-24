@@ -1,0 +1,84 @@
+
+"""
+--- ユーザを管理するテーブル
+CREATE TABLE users (
+    uid   SERIAL      PRIMARY KEY,             -- ユーザID（自動採番）
+    uname VARCHAR(50) NOT NULL UNIQUE,         -- ユーザ名称（ユニーク）
+    upass TEXT        NOT NULL,                -- パスワード
+    magic_number      INTEGER,                 -- マジックナンバー（パスワード処理用ランダム数値）
+    sequence_number   BIGINT,                  -- シーケンス管理用番号（大きな値も扱えるように）
+    last_access_at    TIMESTAMP WITH TIME ZONE -- 最終アクセス日時
+);
+
+--- 機能を管理するテーブル
+CREATE TABLE features (
+    feature_id        SERIAL       PRIMARY KEY,     -- 機能ID
+    feature_name      VARCHAR(100) NOT NULL UNIQUE, -- 機能名称
+    feature_url       TEXT         NOT NULL,        -- 機能URL
+    icon_data         BYTEA,                        -- アイコン画像のバイナリデータ
+    icon_mime_type    VARCHAR(50),                  -- 例: 'image/png'
+    is_deleted        BOOLEAN      DEFAULT FALSE    -- 削除フラグ
+);
+
+--- 使用可能機能を管理するテーブル
+CREATE TABLE user_features (
+    user_id           INTEGER NOT NULL,    -- ユーザID（users.uid）
+    feature_id        INTEGER NOT NULL,    -- 機能ID（features.feature_id）
+    display_order     INTEGER DEFAULT 0,   -- 表示順（小さいほど上に表示）
+    PRIMARY KEY (user_id, feature_id),     -- 複合主キーで重複を防ぐ
+    FOREIGN KEY (user_id)    REFERENCES users(uid)           ON DELETE CASCADE,
+    FOREIGN KEY (feature_id) REFERENCES features(feature_id) ON DELETE CASCADE
+);
+"""
+
+"""
+"""
+
+class Authorize:
+
+    def __init__(self: Self, dbhost: str, dbport: number, dbname: str, dbuser: str, dbpass: str) -> None:
+        return
+
+    def get_magic_number(self: Self, user: string):
+        """
+        マジックナンバー取得処理
+
+        Parameters:
+            user: ユーザ名称
+
+        Returns:
+            number or None: マジックナンバー
+        """
+
+    def try_unlock(self: Self, user: str, magic: str, pass_hash: str) -> number:
+        """
+        認証処理
+
+        Parameters:
+            user: ユーザ名称
+            magic: マジックナンバー
+            pass_hash: ハッシュ化パスワード
+
+        Returns:
+            number or None: シーケンス管理用番号
+        """
+
+    def try_unlock_extend(self: Self, user: str, sequence: number) -> number:
+        """
+        認証延長処理
+
+        Parameters:
+            user: ユーザ名称（ユニーク）
+            sequence: シーケンス管理用番号
+
+        Returns:
+            number or None: シーケンス管理用番号
+        """
+
+    def get_feature_list(self: Self, user: str) -> None:
+        """
+        機能一覧取得
+
+        Parameter:
+            user: ユーザ名称
+        """
