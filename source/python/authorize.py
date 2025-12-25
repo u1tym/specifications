@@ -29,7 +29,10 @@ class Authorize:
             user: ユーザ名称
 
         Returns:
-            number or None: マジックナンバー
+            number: 正数: マジックナンバー
+                    -1:   該当ユーザが存在しない
+                    -2:   認証不正
+                    -9:   処理異常
         """
 
         try:
@@ -40,7 +43,7 @@ class Authorize:
                     row = cur.fetchone()
 
                     if row is None:
-                        return 0  # 該当なし
+                        return -1  # 該当なし
 
                     uid = row[0]
 
@@ -57,14 +60,14 @@ class Authorize:
                     """, (mnum, datetime.now(), uid))
 
                     if cur.rowcount == 0:
-                        return 0  # 更新されなかった場合
+                        return -9  # 更新されなかった場合
 
                     conn.commit()
                     return mnum
 
         except Exception as e:
             print(f"エラーが発生しました: {e}")
-            return 0
+            return -9
 
 
     def try_unlock(self: Self, user: str, magic: int, pass_hash: str) -> int:
@@ -80,6 +83,7 @@ class Authorize:
             number: 正数: シーケンス管理用番号
                     -1:   該当ユーザが存在しない
                     -2:   認証不正
+                    -9:   処理異常
         """
 
         try:
@@ -136,8 +140,43 @@ class Authorize:
         Returns:
             number or None: シーケンス管理用番号
         """
-        result: int = 0
-        return result
+
+        try:
+            with psycopg2.connect(self._dsn) as conn:
+                with conn.cursor() as cur:
+                    # ユーザ確認
+                    cur.execute("""
+                        SELECT uid FROM users
+                        WHERE uname = %s AND sequence_number = %s
+                    """, (user, sequence))
+                    row = cur.fetchone()
+
+                    if row is None:
+                        return -2  # 該当なし
+
+                    uid = row[0]
+
+                    # 新しいシーケンス番号を生成
+                    snum = random.randint(100000, 999999)
+
+                    # 更新処理
+                    cur.execute("""
+                        UPDATE users
+                        SET magic_number = NULL,
+                            sequence_number = %s,
+                            last_access_at = %s
+                        WHERE uid = %s
+                    """, (snum, datetime.now(), uid))
+
+                    if cur.rowcount == 0:
+                        return -2  # 更新されなかった
+
+                    conn.commit()
+                    return snum
+
+        except Exception as e:
+            print(f"DB接続エラー: {e}")
+            return -9
 
 
     def get_feature_list(self: Self, user: str) -> None:
