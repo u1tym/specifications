@@ -12,6 +12,14 @@ import zlib
 from datetime import datetime
 
 from typing import Self
+from typing import TypedDict, List, Optional
+
+class FeatureInfo(TypedDict):
+    fid: int
+    fname: str
+    feature_url: str
+    icon_data: Optional[bytes]
+    icon_mime_type: Optional[str]
 
 class Authorize:
 
@@ -179,10 +187,37 @@ class Authorize:
             return -9
 
 
-    def get_feature_list(self: Self, user: str) -> None:
+    def get_feature_list(self: Self, user: str) -> List[FeatureInfo]:
         """
         機能一覧取得
 
         Parameter:
             user: ユーザ名称
         """
+        try:
+            with psycopg2.connect(self._dsn) as conn:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        SELECT f.fid, f.fname, f.feature_url, f.icon_data, f.icon_mime_type
+                        FROM users u
+                        JOIN user_features uf ON u.uid = uf.uid
+                        JOIN features f ON uf.fid = f.fid
+                        WHERE u.uname = %s AND (f.is_deleted = false OR f.is_deleted IS NULL)
+                        ORDER BY uf.display_order
+                    """, (user,))
+                    rows = cur.fetchall()
+
+                    return [
+                        FeatureInfo(
+                            fid=row[0],
+                            fname=row[1],
+                            feature_url=row[2],
+                            icon_data=row[3],
+                            icon_mime_type=row[4]
+                        )
+                        for row in rows
+                    ]
+
+        except Exception as e:
+            print(f"DBエラー: {e}")
+            return []
