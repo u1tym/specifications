@@ -98,7 +98,7 @@ class Authorize:
             with psycopg2.connect(self._dsn) as conn:
                 with conn.cursor() as cur:
                     # ユーザ情報の取得
-                    cur.execute("SELECT uid, upass FROM users WHERE uname = %s", (user,))
+                    cur.execute("SELECT uid, upass FROM users WHERE uname = %s and magic_number = %s", (user, magic,))
                     row = cur.fetchone()
 
                     if row is None:
