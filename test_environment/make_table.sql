@@ -1,4 +1,6 @@
-CREATE TABLE users (
+create schema auth;
+
+CREATE TABLE auth.users (
     uid               SERIAL      PRIMARY KEY,             -- ユーザID（自動採番）
     uname             VARCHAR(50) NOT NULL UNIQUE,         -- ユーザ名称（ユニーク）
     upass             TEXT        NOT NULL,                -- パスワード
@@ -8,7 +10,7 @@ CREATE TABLE users (
 );
 
 --- 機能を管理するテーブル
-CREATE TABLE features (
+CREATE TABLE auth.features (
     fid               SERIAL       PRIMARY KEY,     -- 機能ID
     fname             VARCHAR(100) NOT NULL UNIQUE, -- 機能名称
     feature_url       TEXT         NOT NULL,        -- 機能URL
@@ -18,11 +20,11 @@ CREATE TABLE features (
 );
 
 --- 使用可能機能を管理するテーブル
-CREATE TABLE user_features (
+CREATE TABLE auth.user_features (
     uid               INTEGER NOT NULL,    -- ユーザID（users.uid）
     fid               INTEGER NOT NULL,    -- 機能ID（features.feature_id）
     display_order     INTEGER DEFAULT 0,   -- 表示順（小さいほど上に表示）
     PRIMARY KEY (uid, fid),                -- 複合主キーで重複を防ぐ
-    FOREIGN KEY (uid) REFERENCES users(uid)    ON DELETE CASCADE,
-    FOREIGN KEY (fid) REFERENCES features(fid) ON DELETE CASCADE
+    FOREIGN KEY (uid) REFERENCES auth.users(uid)    ON DELETE CASCADE,
+    FOREIGN KEY (fid) REFERENCES auth.features(fid) ON DELETE CASCADE
 );

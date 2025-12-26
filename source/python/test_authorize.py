@@ -15,7 +15,7 @@ def main():
 
 def test1():
 
-    a: Authorize = Authorize("127.0.0.1", 5432, "dbauth", "pusr", "pppp")
+    a: Authorize = Authorize("127.0.0.1", 5432, "dbportal", "pusr", "pppp")
     v1 = a.get_magic_number("admin")
     print(v1)
 

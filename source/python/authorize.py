@@ -47,7 +47,7 @@ class Authorize:
             with psycopg2.connect(self._dsn) as conn:
                 with conn.cursor() as cur:
                     # ユーザIDを取得
-                    cur.execute("SELECT uid FROM users WHERE uname = %s", (user,))
+                    cur.execute("SELECT uid FROM auth.users WHERE uname = %s", (user,))
                     row = cur.fetchone()
 
                     if row is None:
@@ -60,7 +60,7 @@ class Authorize:
 
                     # ユーザ情報を更新
                     cur.execute("""
-                        UPDATE users
+                        UPDATE auth.users
                         SET magic_number = %s,
                             sequence_number = NULL,
                             last_access_at = %s
@@ -98,7 +98,7 @@ class Authorize:
             with psycopg2.connect(self._dsn) as conn:
                 with conn.cursor() as cur:
                     # ユーザ情報の取得
-                    cur.execute("SELECT uid, upass FROM users WHERE uname = %s and magic_number = %s", (user, magic,))
+                    cur.execute("SELECT uid, upass FROM auth.users WHERE uname = %s and magic_number = %s", (user, magic,))
                     row = cur.fetchone()
 
                     if row is None:
@@ -118,7 +118,7 @@ class Authorize:
 
                     # ユーザ情報を更新
                     cur.execute("""
-                        UPDATE users
+                        UPDATE auth.users
                         SET magic_number = NULL,
                             sequence_number = %s,
                             last_access_at = %s
@@ -154,7 +154,7 @@ class Authorize:
                 with conn.cursor() as cur:
                     # ユーザ確認
                     cur.execute("""
-                        SELECT uid FROM users
+                        SELECT uid FROM auth.users
                         WHERE uname = %s AND sequence_number = %s
                     """, (user, sequence))
                     row = cur.fetchone()
@@ -169,7 +169,7 @@ class Authorize:
 
                     # 更新処理
                     cur.execute("""
-                        UPDATE users
+                        UPDATE auth.users
                         SET magic_number = NULL,
                             sequence_number = %s,
                             last_access_at = %s
@@ -199,9 +199,9 @@ class Authorize:
                 with conn.cursor() as cur:
                     cur.execute("""
                         SELECT f.fid, f.fname, f.feature_url, f.icon_data, f.icon_mime_type
-                        FROM users u
-                        JOIN user_features uf ON u.uid = uf.uid
-                        JOIN features f ON uf.fid = f.fid
+                        FROM auth.users u
+                        JOIN auth.user_features uf ON u.uid = uf.uid
+                        JOIN auth.features f ON uf.fid = f.fid
                         WHERE u.uname = %s AND (f.is_deleted = false OR f.is_deleted IS NULL)
                         ORDER BY uf.display_order
                     """, (user,))
