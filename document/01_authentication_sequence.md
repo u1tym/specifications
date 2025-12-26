@@ -31,25 +31,25 @@ sequenceDiagram
   LG --)- FR:
 
   HM ->>+ FR: ログイン
-  FR ->>+ BA: プレ要求(USER)
+  FR ->>+ BA: 認証．プレ要求(USER)
   BA ->>+ CA: マジックナンバー取得処理
   CA ->>+ DA:
   DA --)- CA:
   CA --)- BA:
-  BA --)- FR: プレ応答(MAGIC_NUMBER)
+  BA --)- FR: 認証．プレ応答(MAGIC_NUMBER)
 
-  FR ->>+ BA: 開錠要求(USER, MAGIC_NUMBER, HASH_PASS)
+  FR ->>+ BA: 認証．開錠要求(USER, MAGIC_NUMBER, HASH_PASS)
   BA ->>+ CA: 認証処理
   CA ->>+ DA:
   DA --)- CA:
   CA --)- BA:
-  BA --)- FR: 開錠応答(RESULT, SEQ_NUMBER)
+  BA --)- FR: 認証処理．開錠応答(RESULT, SEQ_NUMBER)
   note over FR: 更新 session storage<br>USER, SEQ_NUMBER
 
   FR ->>+ MN: メニューページ
   MN --)- FR:
   note over FR: 取得 session storage<br>USER, SEQ_NUMBER
-  FR ->>+ BM: JOB一覧要求(USER, SEQ_NUMBER)
+  FR ->>+ BM: メニュー．機能一覧要求(USER, SEQ_NUMBER)
   BM ->>+ CA: 認証延長処理
   CA ->>+ DA:
   DA --)- CA:
@@ -58,7 +58,7 @@ sequenceDiagram
   CA ->>+ DA:
   DA --)- CA:
   CA --)- BM:
-  BM --)- FR: JOB一覧応答(RESULT, SEQ_NUMBER, JOB一覧)
+  BM --)- FR: メニュー．機能一覧応答(RESULT, SEQ_NUMBER, JOB一覧)
   note over FR: 更新 session storage<br>USER, SEQ_NUMBER
   FR --)- HM: メニュー表示
 
