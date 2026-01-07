@@ -179,11 +179,11 @@ class Expense:
                         return False
                     aid: int = row[0]
 
-                    # 支払い方法を追加（スキーマにaidカラムがないため、コメントのaidは無視）
+                    # 支払い方法を追加
                     cur.execute("""
-                        INSERT INTO expense.payments (uid, payment_name, closing_day, payment_offset_month, payment_day, deleted_at)
-                        VALUES (%s, %s, 0, 0, 0, NULL)
-                    """, (uid, pname))
+                        INSERT INTO expense.payments (uid, payment_name, closing_day, payment_offset_month, payment_day, aid, deleted_at)
+                        VALUES (%s, %s, 0, 0, 0, %s, NULL)
+                    """, (uid, pname, aid))
 
                     conn.commit()
                     return True
@@ -243,11 +243,11 @@ class Expense:
                         return False
                     aid: int = row[0]
 
-                    # 支払い方法を追加（スキーマにaidカラムがないため、コメントのaidは無視）
+                    # 支払い方法を追加
                     cur.execute("""
-                        INSERT INTO expense.payments (uid, payment_name, closing_day, payment_offset_month, payment_day, deleted_at)
-                        VALUES (%s, %s, %s, %s, %s, NULL)
-                    """, (uid, pname, close_day, payment_offset_month, payment_day))
+                        INSERT INTO expense.payments (uid, payment_name, closing_day, payment_offset_month, payment_day, aid, deleted_at)
+                        VALUES (%s, %s, %s, %s, %s, %s, NULL)
+                    """, (uid, pname, close_day, payment_offset_month, payment_day, aid))
 
                     conn.commit()
                     return True

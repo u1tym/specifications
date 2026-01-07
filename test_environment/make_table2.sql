@@ -16,8 +16,10 @@ create table expense.payments (
     closing_day          INTEGER,
     payment_offset_month INTEGER,
     payment_day          INTEGER,
+    aid                  INTEGER,
     deleted_at           DATE,
     FOREIGN KEY (uid) REFERENCES auth.users(uid) ON DELETE CASCADE,
+    FOREIGN KEY (aid) REFERENCES expense.accounts(aid),
     UNIQUE(uid, payment_name)
 );
 
