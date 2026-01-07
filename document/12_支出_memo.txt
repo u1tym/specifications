@@ -1,0 +1,19 @@
+◆ 口座作成
+uname、aname
+
+◆ 口座削除
+uname、aname
+
+◆ 支払方法作成
+uname、pname、当日、支払口座名称
+uname、pname、後日、締め日、支払月、支払日、支払口座名称
+
+◆ 支払方法削除
+uname、pname
+
+◆ 取引追加
+uname、tdate、purpose、memo、pname、amount_spent、aid、amount_received
+
+◆ 取引削除
+uname、tdate、dorder
+
