@@ -16,4 +16,3 @@ uname、tdate、purpose、memo、pname、amount_spent、aid、amount_received
 
 ◆ 取引削除
 uname、tdate、dorder
-
