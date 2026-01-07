@@ -1,7 +1,7 @@
 create schema expense;
 
 create table expense.accounts (
-    aid          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    aid          SERIAL PRIMARY KEY,
     uid          INTEGER                      NOT NULL,
     account_name TEXT                         NOT NULL,
     is_deleted   BOOLEAN                      DEFAULT FALSE,
@@ -10,10 +10,10 @@ create table expense.accounts (
 );
 
 create table expense.payments (
-    pid                  GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    pid                  SERIAL PRIMARY KEY,
     uid                  INTEGER                      NOT NULL,
     payment_name         TEXT                         NOT NULL,
-    closing_date         DATE,
+    closing_day          INTEGER,
     payment_offset_month INTEGER,
     payment_day          INTEGER,
     deleted_at           DATE,
@@ -23,7 +23,7 @@ create table expense.payments (
 
 
 create table expense.transactions (
-    tid                  GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    tid                  SERIAL PRIMARY KEY,
     uid                  INTEGER                      NOT NULL,
     transaction_date     DATE                         NOT NULL, -- 利用日
     dorder               INTEGER                      NOT NULL, -- transaction_date毎のユニークな連番
@@ -59,7 +59,7 @@ execute function expense.set_transactions_dorder();
 
 
 create table expense.account_histories (
-    hid          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    hid          SERIAL PRIMARY KEY,
     aid          INTEGER                      NOT NULL,
     payment_date DATE                         NOT NULL,
     dorder       INTEGER                      NOT NULL, -- payment_date毎の連番
@@ -87,3 +87,13 @@ create trigger trg_set_account_histories_dorder
 before insert on expense.account_histories
 for each row
 execute function expense.set_account_histories_dorder();
+
+
+
+---
+drop table expense.accounts cascade;
+drop table expense.payments cascade;
+drop table expense.transactions cascade;
+drop table expense.account_histories cascade;
+drop function expense.set_transactions_dorder;
+drop function expense.set_account_histories_dorder;
